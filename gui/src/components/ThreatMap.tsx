@@ -1,5 +1,6 @@
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { translations, Language } from '../translations';
 
 interface ThreatLocation {
     ip: string;
@@ -12,9 +13,12 @@ interface ThreatLocation {
 interface ThreatMapProps {
     threats: ThreatLocation[];
     theme: 'cyber' | 'forest';
+    lang: Language;
 }
 
-export function ThreatMap({ threats, theme }: ThreatMapProps) {
+export function ThreatMap({ threats, theme, lang }: ThreatMapProps) {
+    const t = translations[lang];
+
     return (
         <div className="h-full w-full bg-[var(--bg-secondary)] rounded-lg overflow-hidden relative z-0">
             <MapContainer
@@ -34,25 +38,25 @@ export function ThreatMap({ threats, theme }: ThreatMapProps) {
                     }
                 />
 
-                {threats.map((t) => (
+                {threats.map((tLoc) => (
                     <CircleMarker
-                        key={t.ip}
-                        center={[t.lat, t.lng]}
+                        key={tLoc.ip}
+                        center={[tLoc.lat, tLoc.lng]}
                         radius={8}
                         pathOptions={{
-                            color: t.score > 75 ? '#ef4444' : '#eab308',
-                            fillColor: t.score > 75 ? '#ef4444' : '#eab308',
+                            color: tLoc.score > 75 ? '#ef4444' : '#eab308',
+                            fillColor: tLoc.score > 75 ? '#ef4444' : '#eab308',
                             fillOpacity: 0.8,
                             weight: 2,
-                            className: t.score > 75 ? 'threat-pulse-red' : 'threat-pulse-yellow'
+                            className: tLoc.score > 75 ? 'threat-pulse-red' : 'threat-pulse-yellow'
                         }}
                     >
                         <Popup>
                             <div className="font-mono text-sm">
-                                <div className="font-bold text-gray-900">{t.ip}</div>
-                                <div className="text-xs text-gray-600">{t.country}</div>
-                                <div className={`text-xs font-bold mt-1 ${t.score > 80 ? 'text-red-600' : 'text-yellow-600'}`}>
-                                    Threat Score: {t.score}
+                                <div className="font-bold text-gray-900">{tLoc.ip}</div>
+                                <div className="text-xs text-gray-600">{tLoc.country}</div>
+                                <div className={`text-xs font-bold mt-1 ${tLoc.score > 80 ? 'text-red-600' : 'text-yellow-600'}`}>
+                                    {t.history.columns.score}: {tLoc.score}
                                 </div>
                             </div>
                         </Popup>

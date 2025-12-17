@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { translations, Language } from '../translations';
 
 interface LogEntry {
     timestamp: string;
@@ -16,10 +17,12 @@ interface HistoryModalProps {
     onClose: () => void;
     logs: LogEntry[];
     theme: 'cyber' | 'forest';
+    lang: Language;
 }
 
-export function HistoryModal({ isOpen, onClose, logs, theme }: HistoryModalProps) {
+export function HistoryModal({ isOpen, onClose, logs, theme, lang }: HistoryModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
+    const t = translations[lang];
 
     // Close on Escape
     useEffect(() => {
@@ -47,7 +50,7 @@ export function HistoryModal({ isOpen, onClose, logs, theme }: HistoryModalProps
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]">
                     <h2 className="text-lg font-bold text-[var(--accent-primary)] flex items-center gap-2">
-                        <span>📜</span> Traffic History Log
+                        <span>📜</span> {t.history.modalTitle}
                     </h2>
                     <button
                         onClick={onClose}
@@ -62,19 +65,19 @@ export function HistoryModal({ isOpen, onClose, logs, theme }: HistoryModalProps
                     <table className="w-full text-xs font-mono">
                         <thead className="sticky top-0 bg-[var(--bg-secondary)] text-[var(--text-dim)] shadow-sm">
                             <tr>
-                                <th className="text-left p-2">Time</th>
-                                <th className="text-left p-2">IP</th>
-                                <th className="text-left p-2">Country</th>
-                                <th className="text-left p-2">Action</th>
-                                <th className="text-left p-2">Score</th>
-                                <th className="text-left p-2">Signature</th>
+                                <th className="text-left p-2">{t.history.columns.time}</th>
+                                <th className="text-left p-2">{t.history.columns.ip}</th>
+                                <th className="text-left p-2">{t.history.columns.country}</th>
+                                <th className="text-left p-2">{t.history.columns.action}</th>
+                                <th className="text-left p-2">{t.history.columns.score}</th>
+                                <th className="text-left p-2">{t.history.columns.signature}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {logs.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="text-center text-[var(--text-dim)] p-8">
-                                        No traffic logs yet. Start the NetShield engine to generate data.
+                                        {t.history.empty}
                                     </td>
                                 </tr>
                             ) : (
@@ -111,8 +114,8 @@ export function HistoryModal({ isOpen, onClose, logs, theme }: HistoryModalProps
 
                 {/* Footer */}
                 <div className="p-3 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] text-[10px] text-[var(--text-dim)] flex justify-between">
-                    <span>Showing last {logs.length} entries</span>
-                    <span>Source: traffic.csv</span>
+                    <span>{t.history.showingLast} {logs.length} {t.history.entries}</span>
+                    <span>{t.history.source}: traffic.csv</span>
                 </div>
             </div>
         </div>

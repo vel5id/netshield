@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { TrafficChart } from './components/TrafficChart'
 import { ThreatMap } from './components/ThreatMap'
 import { HistoryModal } from './components/HistoryModal'
+import { translations, Language } from './translations'
 
 interface TrafficStats {
     udp_packets: number
@@ -40,10 +41,20 @@ function App() {
     const [logs, setLogs] = useState<LogEntry[]>([])
     const [showHistory, setShowHistory] = useState(false)
     const [theme, setTheme] = useState<'cyber' | 'forest'>('cyber')
+    const [lang, setLang] = useState<Language>('en')
     const ws = useRef<WebSocket | null>(null)
+    const t = translations[lang]
 
     const toggleTheme = () => {
         setTheme(prev => prev === 'cyber' ? 'forest' : 'cyber')
+    }
+
+    const toggleLang = () => {
+        setLang(prev => {
+            if (prev === 'en') return 'ru'
+            if (prev === 'ru') return 'kk'
+            return 'en'
+        })
     }
 
     useEffect(() => {
@@ -116,7 +127,7 @@ function App() {
             <div className="titlebar-drag h-12 flex-none flex justify-between items-center px-4 bg-[var(--bg-secondary)] border-b border-[var(--border-primary)] select-none z-50 backdrop-blur-md transition-colors duration-300">
                 <div className="flex items-center gap-3">
                     <h1 className="text-xl font-bold tracking-wider text-[var(--accent-primary)] flex items-baseline gap-2">
-                        NETSHIELD
+                        {t.appTitle}
                         <span className="text-xs text-[var(--text-dim)] font-normal font-sans tracking-normal opacity-70">by h621</span>
                     </h1>
                     <span className="px-1.5 py-0.5 rounded-md bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[10px] font-bold text-[var(--text-dim)] shadow-sm">v3.0</span>
@@ -124,15 +135,23 @@ function App() {
                 <div className="flex items-center titlebar-no-drag">
                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold mr-4 ${connected ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
-                        {connected ? 'CONNECTED' : 'OFFLINE'}
+                        {connected ? t.status.connected : t.status.offline}
                     </div>
+
+                    {/* Lang Toggle */}
+                    <button
+                        onClick={toggleLang}
+                        className="h-8 px-3 mr-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors bg-[var(--bg-primary)] border border-[var(--border-primary)] text-[var(--text-base)] hover:bg-[var(--accent-glow)]"
+                    >
+                        {lang === 'en' ? '🇺🇸 EN' : lang === 'ru' ? '🇷🇺 RU' : '🇰🇿 KK'}
+                    </button>
 
                     {/* Theme Toggle */}
                     <button
                         onClick={toggleTheme}
                         className="h-8 px-3 mr-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors bg-[var(--accent-glow)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white"
                     >
-                        {theme === 'forest' ? '🌲 Forest' : '💠 Cyber'}
+                        {theme === 'forest' ? `🌲 ${t.theme.forest}` : `💠 ${t.theme.cyber}`}
                     </button>
 
                     <div className="flex items-center h-12 border-l border-gray-800">
@@ -160,12 +179,12 @@ function App() {
                     <div className="absolute top-3 left-4 z-[400] bg-[var(--bg-secondary)] px-3 py-1.5 rounded border border-[var(--border-primary)] backdrop-blur shadow-lg">
                         <h3 className="text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 text-[var(--text-base)]">
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                            Active Threat Map
+                            {t.map.title}
                         </h3>
                     </div>
                     {/* Map Container - Strictly follows parent size */}
                     <div className="flex-1 w-full relative">
-                        <ThreatMap threats={MOCK_THREATS} theme={theme} />
+                        <ThreatMap threats={MOCK_THREATS} theme={theme} lang={lang} />
                     </div>
                 </div>
 
@@ -175,10 +194,10 @@ function App() {
                     {/* LEFT: Traffic Chart (70% Width) */}
                     <div className="flex-[7] border border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-xl p-0.5 flex flex-col shadow-lg overflow-hidden backdrop-blur-sm">
                         <div className="px-4 py-2 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider">Live Traffic Analysis</h3>
+                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider">{t.chart.title}</h3>
                         </div>
                         <div className="flex-1 min-h-0 relative">
-                            <TrafficChart data={history} theme={theme} />
+                            <TrafficChart data={history} theme={theme} lang={lang} />
                         </div>
                     </div>
 
@@ -187,7 +206,7 @@ function App() {
 
                         {/* Speed */}
                         <div className="bg-[var(--bg-secondary)] p-3 rounded-lg border border-[var(--border-primary)] flex flex-col justify-center flex-1 min-h-[70px] backdrop-blur-sm">
-                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider mb-1">Bandwidth</h3>
+                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider mb-1">{t.chart.bandwidth}</h3>
                             <div className="flex items-end gap-1">
                                 <span className="text-xl font-bold text-[var(--accent-primary)] leading-none">{stats ? stats.speed_mbps.toFixed(2) : '0.00'}</span>
                                 <span className="text-[10px] text-[var(--text-dim)] mb-0.5">MB/s</span>
@@ -202,7 +221,7 @@ function App() {
 
                         {/* Packets */}
                         <div className="bg-[var(--bg-secondary)] p-3 rounded-lg border border-[var(--border-primary)] flex-1 min-h-[70px] flex flex-col justify-center backdrop-blur-sm">
-                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider mb-1">Total Packets</h3>
+                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider mb-1">{t.stats.totalPackets}</h3>
                             <div className="text-lg font-bold text-blue-400 leading-none mb-1">
                                 {stats ? (stats.udp_packets + stats.tcp_packets).toLocaleString() : '0'}
                             </div>
@@ -214,7 +233,7 @@ function App() {
 
                         {/* Blocked */}
                         <div className="bg-[var(--bg-secondary)] p-3 rounded-lg border border-[var(--border-primary)] flex-1 min-h-[70px] flex flex-col justify-center backdrop-blur-sm">
-                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider mb-1">Blocked Packets</h3>
+                            <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider mb-1">{t.stats.blockedPackets}</h3>
                             <div className="text-lg font-bold text-red-500 leading-none mb-1">
                                 {stats ? (stats.udp_dropped + stats.tcp_dropped).toLocaleString() : '0'}
                             </div>
@@ -229,19 +248,19 @@ function App() {
                                 📜
                             </div>
                             <div className="flex justify-between items-center mb-1 relative z-10">
-                                <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider">History Log</h3>
-                                <span className="text-[9px] text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transition-opacity">VIEW ALL</span>
+                                <h3 className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-wider">{t.history.title}</h3>
+                                <span className="text-[9px] text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transition-opacity">{t.history.viewAll}</span>
                             </div>
                             <div className="relative z-10">
                                 <div className={`text-[11px] font-mono text-[var(--text-base)] truncate border-l-2 pl-2 mb-1 ${logs.length > 0 && logs[logs.length - 1].throttled ? 'border-red-500' : 'border-green-500'}`}>
                                     {logs.length > 0 ? (
                                         <>{logs[logs.length - 1].throttled ? 'THROTTLE' : 'ALLOW'} <span className="text-[var(--text-dim)]">{logs[logs.length - 1].ip}</span></>
                                     ) : (
-                                        <>NO DATA <span className="text-[var(--text-dim)]">—</span></>
+                                        <>{t.widget.noData} <span className="text-[var(--text-dim)]">—</span></>
                                     )}
                                 </div>
                                 <div className="text-[9px] text-[var(--text-dim)] pl-2">
-                                    {logs.length > 0 ? `Last: ${logs[logs.length - 1].timestamp}` : 'Waiting for data...'}
+                                    {logs.length > 0 ? `Last: ${logs[logs.length - 1].timestamp}` : t.widget.waiting}
                                 </div>
                             </div>
                         </div>
@@ -255,6 +274,7 @@ function App() {
                 onClose={() => setShowHistory(false)}
                 logs={logs}
                 theme={theme}
+                lang={lang}
             />
         </div>
     )

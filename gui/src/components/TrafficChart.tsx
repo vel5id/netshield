@@ -1,4 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { translations, Language } from '../translations';
 
 interface TrafficData {
     time: string;
@@ -10,9 +11,12 @@ interface TrafficData {
 interface TrafficChartProps {
     data: TrafficData[];
     theme: 'cyber' | 'forest';
+    lang: Language;
 }
 
-export function TrafficChart({ data, theme }: TrafficChartProps) {
+export function TrafficChart({ data, theme, lang }: TrafficChartProps) {
+    const t = translations[lang];
+
     // Colors based on theme
     const gridColor = theme === 'forest' ? '#d1fae5' : '#374151'; // emerald-100 vs gray-700
     const textColor = theme === 'forest' ? '#065f46' : '#9ca3af'; // emerald-800 vs gray-400
@@ -60,6 +64,7 @@ export function TrafficChart({ data, theme }: TrafficChartProps) {
                     <Area
                         type="monotone"
                         dataKey="speed"
+                        name={t.chart.bandwidth}
                         stroke={strokeColor}
                         fillOpacity={1}
                         fill="url(#colorSpeed)"
