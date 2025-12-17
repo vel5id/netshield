@@ -1,26 +1,61 @@
-# Byte-compiled / optimized / DLL files
+# NetShield Git Ignore
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.mypy_cache/
 
-# Logs
+# Logs & Data
 logs/
 *.log
+feeds/
+d:/Py/netshield_logs/
+netshield_logs/
+traffic.csv
 
-# IDE
+# GUI (Node/Electron/Vite)
+node_modules/
+gui/node_modules/
+gui/dist/
+gui/dist-electron/
+gui/release/
+.eslintcache
+*.tsbuildinfo
+gui/out/
+
+# IDE & OS
 .vscode/
 .idea/
 *.swp
-
-# Model files
-*.joblib
-*.pkl
-
-# Cache
-.pytest_cache/
-.mypy_cache/
-feeds/
-
-# OS
+*.swo
 Thumbs.db
 .DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Models & Large Files
+*.joblib
+*.pkl
+*.model
+*.h5
+*.onnx

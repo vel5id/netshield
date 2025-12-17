@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme Variables */
+:root {
+  /* Default: Cyber Theme */
+  --accent-primary: #06b6d4;
+  /* cyan-500 */
+  --accent-primary-dim: #0891b2;
+  /* cyan-600 */
+  --accent-glow: rgba(6, 182, 212, 0.3);
+  --bg-primary: #111827;
+  /* gray-900 */
+  --bg-secondary: #1f2937;
+  /* gray-800 */
+  --border-primary: #374151;
+  /* gray-700 */
+  --border-accent: #06b6d4;
+}
+
+[data-theme="forest"] {
+  /* Daytime Forest Theme */
+  --accent-primary: #15803d;
+  /* green-700 */
+  --accent-primary-dim: #166534;
+  /* green-800 */
+  --accent-glow: rgba(21, 128, 61, 0.2);
+  --bg-primary: #f0fdf4;
+  /* green-50 (Daytime) */
+  --bg-secondary: #dcfce7;
+  /* green-100 */
+  --border-primary: #86efac;
+  /* green-300 */
+  --border-accent: #15803d;
+  --text-base: #14532d;
+  /* green-900 */
+}
+
+/* Electron Drag Regions */
+.titlebar-drag {
+  -webkit-app-region: drag;
+}
+
+.titlebar-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Leaflet CircleMarker Pulse Animations (SVG-based) */
+.threat-pulse-red {
+  animation: svg-pulse-red 1.5s ease-in-out infinite;
+}
+
+.threat-pulse-yellow {
+  animation: svg-pulse-yellow 1.5s ease-in-out infinite;
+}
+
+@keyframes svg-pulse-red {
+
+  0%,
+  100% {
+    stroke-width: 2;
+    stroke-opacity: 1;
+    opacity: 1;
+  }
+
+  50% {
+    stroke-width: 8;
+    stroke-opacity: 0.4;
+    opacity: 0.6;
+  }
+}
+
+@keyframes svg-pulse-yellow {
+
+  0%,
+  100% {
+    stroke-width: 2;
+    stroke-opacity: 1;
+    opacity: 1;
+  }
+
+  50% {
+    stroke-width: 8;
+    stroke-opacity: 0.4;
+    opacity: 0.6;
+  }
+}

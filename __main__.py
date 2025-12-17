@@ -179,6 +179,11 @@ Security Notes:
     
     # Run engine
     try:
+        # P2: Start WebSocket Server
+        from .api import WebSocketServer
+        ws_server = WebSocketServer(engine)
+        ws_server.start()
+        
         engine.run(stats_callback=Console.print_stats)
     except PermissionError:
         Console.print_error("Administrator privileges required!")
@@ -193,6 +198,8 @@ Security Notes:
         Console.print_summary(summary)
         
         # Cleanup
+        if 'ws_server' in locals():
+            ws_server.stop()
         logger.stop()
 
 

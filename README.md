@@ -1,6 +1,15 @@
 # NetShield 🛡️
 
+[![Tests](https://img.shields.io/badge/tests-159%20passed-brightgreen)](https://github.com/vel5id/netshield)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)](https://github.com/vel5id/netshield)
+
 **VRChat Network Protection Shield** — защита от DDoS/crash-атак с OSINT-профилированием и ML-детекцией.
+
+<p align="center">
+  <img src="docs/demo.png" alt="NetShield Demo" width="600">
+</p>
 
 ---
 
@@ -85,7 +94,7 @@ Detected behaviors are mapped to MITRE ATT&CK framework:
 ## Installation
 
 ```powershell
-git clone https://github.com/YOUR_USERNAME/netshield.git
+git clone https://github.com/vel5id/netshield.git
 cd netshield
 
 # Core dependencies

@@ -59,6 +59,7 @@ MODE_UNIVERSAL = "universal"
 MODE_CUSTOM = "custom"
 
 VALID_MODES = {MODE_VRCHAT, MODE_UNIVERSAL, MODE_CUSTOM}
+DEFAULT_MODE = MODE_VRCHAT
 
 
 # ============================================================================
