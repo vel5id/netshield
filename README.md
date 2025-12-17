@@ -2,7 +2,8 @@
   <img src="docs/demo.png" alt="NetShield Dashboard" width="700">
 </p>
 
-<h1 align="center">🛡️ NetShield</h1>
+<h1 align="center">🛡️ NetShield (Alpha)</h1>
+<h1 align="center">For educational purposes only</h1>
 
 <p align="center">
   <strong>Protect your VRChat sessions from network attacks — in real-time.</strong>
