@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Model files
+*.joblib
+*.pkl
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+feeds/
+
+# OS
+Thumbs.db
+.DS_Store

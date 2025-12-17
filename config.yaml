@@ -1,0 +1,37 @@
+# NetShield Default Configuration
+# ================================
+# Copy to ~/.netshield/config.yaml for user-specific settings
+
+mode: vrchat  # vrchat | universal | custom
+
+limits:
+  max_bandwidth_mbps: 50.0
+  burst_size_mb: 10.0
+
+watchlist:
+  threshold: 80
+  max_entries: 10000
+
+whois:
+  enabled: true
+  rate_limit_per_sec: 5
+  cache_max_size: 50000
+  cache_ttl_hours: 24
+
+logging:
+  directory: netshield_logs
+  integrity_check: false  # Set true and NETSHIELD_LOG_SECRET env var
+
+# DISCLAIMER: Threat intelligence configuration
+# Modify according to your organization's threat model
+threat_intel:
+  # Countries with UN Security Council sanctions (conservative default)
+  high_risk_countries:
+    - KP  # North Korea
+  
+  # ASN keywords that MAY indicate proxy/hosting
+  suspicious_asn_keywords:
+    - bulletproof
+    - hosting
+    - vps
+    - proxy
