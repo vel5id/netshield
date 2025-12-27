@@ -126,6 +126,9 @@ class EventLogger:
                 self._process_write(item)
             except Exception as e:
                 logger.error(f"Write error: {e}")
+            finally:
+                # Signal task completion for flush() to work correctly
+                self._write_queue.task_done()
     
     def _process_write(self, item: dict):
         """Process a write item from the queue."""
@@ -287,6 +290,6 @@ class EventLogger:
     
     def flush(self):
         """Wait for all queued writes to complete."""
-        while not self._write_queue.empty():
-            import time
-            time.sleep(0.1)
+        # Use join() which blocks until all items have been processed
+        # This is more efficient than busy-waiting with sleep
+        self._write_queue.join()

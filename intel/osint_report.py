@@ -11,6 +11,7 @@ Features:
   - Threat correlation
 """
 
+import heapq
 import json
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -116,10 +117,11 @@ class OSINTReport:
             key = f"{p.asn} ({p.asn_description[:30]}...)" if len(p.asn_description) > 30 else f"{p.asn} ({p.asn_description})"
             asns[key] = asns.get(key, 0) + 1
         
-        # Top offenders
-        top_by_traffic = sorted(profiles, key=lambda x: x.total_bytes, reverse=True)[:10]
-        top_by_throttle = sorted(profiles, key=lambda x: x.throttled_packets, reverse=True)[:10]
-        top_by_score = sorted(profiles, key=lambda x: x.threat_score, reverse=True)[:10]
+        # Top offenders - use heapq.nlargest for O(n log k) instead of O(n log n)
+        # This is more efficient when we only need top 10 from potentially large lists
+        top_by_traffic = heapq.nlargest(10, profiles, key=lambda x: x.total_bytes)
+        top_by_throttle = heapq.nlargest(10, profiles, key=lambda x: x.throttled_packets)
+        top_by_score = heapq.nlargest(10, profiles, key=lambda x: x.threat_score)
         
         return {
             "summary": {
