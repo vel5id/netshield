@@ -161,7 +161,9 @@ class ThreatFeed:
                     continue
                 
                 # Extract IP (first column for most formats)
-                ip = line.split()[0] if line.split() else line
+                # Split once and reuse result
+                parts = line.split()
+                ip = parts[0] if parts else line
                 
                 if self._validate_ip(ip):
                     ips.add(ip)

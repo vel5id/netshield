@@ -31,6 +31,7 @@ from threading import Thread, Event
 from collections import defaultdict
 from dataclasses import dataclass
 
+from collections import deque
 from .ipc import IPCClient, PacketData, Command, CommandType
 from .config import NetShieldConfig, load_config
 from .loggers import EventLogger
@@ -126,9 +127,10 @@ class Worker:
         # Logger
         self.logger = EventLogger(config.log_dir)
         
-        # Rate tracking (sliding window)
-        self.rate_samples: list = []
+        # Rate tracking (sliding window) - use deque for efficient cleanup
+        self.rate_samples: deque = deque(maxlen=10000)
         self.rate_window = 1.0  # seconds
+        self._rate_bytes_sum = 0  # Cached sum for efficiency
         
         # Background threads
         self.threads: list = []
@@ -218,9 +220,9 @@ class Worker:
         tracker = self.ip_trackers[src_ip]
         tracker.update(packet.size)
         
-        # Rate tracking
+        # Rate tracking - add sample and update cached sum
         self.rate_samples.append((now, packet.size))
-        self._cleanup_rate_samples()
+        self._rate_bytes_sum += packet.size
         
         # Quick threat checks (fast path)
         threat_score = self._quick_threat_check(src_ip, tracker, packet)
@@ -288,28 +290,24 @@ class Worker:
         return tracker.threat_score
     
     def _get_ip_rate_mbps(self, ip: str) -> float:
-        """Get current rate for IP in MB/s."""
+        """Get current rate for all traffic in MB/s."""
         now = time.time()
         cutoff = now - self.rate_window
         
-        total_bytes = 0
-        for ts, size in self.rate_samples:
-            if ts >= cutoff:
-                total_bytes += size
+        # Use the pre-computed sum and remove expired samples
+        self._cleanup_rate_samples(cutoff)
         
-        return (total_bytes / self.rate_window) / 1024 / 1024
+        return (self._rate_bytes_sum / self.rate_window) / 1024 / 1024
     
-    def _cleanup_rate_samples(self):
-        """Remove old rate samples."""
-        cutoff = time.time() - self.rate_window
-        self.rate_samples = [
-            (ts, size) for ts, size in self.rate_samples
-            if ts >= cutoff
-        ]
+    def _cleanup_rate_samples(self, cutoff: float = None):
+        """Remove old rate samples from the deque."""
+        if cutoff is None:
+            cutoff = time.time() - self.rate_window
         
-        # Limit size
-        if len(self.rate_samples) > 10000:
-            self.rate_samples = self.rate_samples[-5000:]
+        # Remove expired samples from left (oldest) side
+        while self.rate_samples and self.rate_samples[0][0] < cutoff:
+            _, size = self.rate_samples.popleft()
+            self._rate_bytes_sum -= size
     
     def _start_background_tasks(self):
         """Start background analysis threads."""
