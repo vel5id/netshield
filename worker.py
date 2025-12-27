@@ -27,11 +27,10 @@ import logging
 import ctypes
 from typing import Optional, Dict
 from datetime import datetime
-from threading import Thread, Event
-from collections import defaultdict
+from threading import Thread, Event, Lock
+from collections import defaultdict, deque
 from dataclasses import dataclass
 
-from collections import deque
 from .ipc import IPCClient, PacketData, Command, CommandType
 from .config import NetShieldConfig, load_config
 from .loggers import EventLogger
@@ -131,6 +130,7 @@ class Worker:
         self.rate_samples: deque = deque(maxlen=10000)
         self.rate_window = 1.0  # seconds
         self._rate_bytes_sum = 0  # Cached sum for efficiency
+        self._rate_lock = Lock()  # Thread safety for rate tracking
         
         # Background threads
         self.threads: list = []
@@ -220,9 +220,10 @@ class Worker:
         tracker = self.ip_trackers[src_ip]
         tracker.update(packet.size)
         
-        # Rate tracking - add sample and update cached sum
-        self.rate_samples.append((now, packet.size))
-        self._rate_bytes_sum += packet.size
+        # Rate tracking - add sample and update cached sum (thread-safe)
+        with self._rate_lock:
+            self.rate_samples.append((now, packet.size))
+            self._rate_bytes_sum += packet.size
         
         # Quick threat checks (fast path)
         threat_score = self._quick_threat_check(src_ip, tracker, packet)
@@ -294,13 +295,13 @@ class Worker:
         now = time.time()
         cutoff = now - self.rate_window
         
-        # Use the pre-computed sum and remove expired samples
-        self._cleanup_rate_samples(cutoff)
-        
-        return (self._rate_bytes_sum / self.rate_window) / 1024 / 1024
+        # Use the pre-computed sum and remove expired samples (thread-safe)
+        with self._rate_lock:
+            self._cleanup_rate_samples_unsafe(cutoff)
+            return (self._rate_bytes_sum / self.rate_window) / 1024 / 1024
     
-    def _cleanup_rate_samples(self, cutoff: float = None):
-        """Remove old rate samples from the deque."""
+    def _cleanup_rate_samples_unsafe(self, cutoff: float = None):
+        """Remove old rate samples from the deque. Must be called with _rate_lock held."""
         if cutoff is None:
             cutoff = time.time() - self.rate_window
         
